@@ -116,7 +116,7 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
      * @param sourceData
      * @return
      */
-    public List<String> getColumeAttribute(List<List<String>> sourceData) {
+    private List<String> getColumeAttribute(List<List<String>> sourceData) {
 
         List<String> result = new ArrayList<>();
         if (sourceData.isEmpty() || sourceData.size() < 2) {
