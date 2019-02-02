@@ -1,15 +1,18 @@
 package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2ArffService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import weka.core.Instances;
+import weka.core.converters.ArffSaver;
+import weka.core.converters.CSVLoader;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class Csv2ArffServiceImpl implements Csv2ArffService {
@@ -24,61 +27,52 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
             return false;
         }
 
-        BufferedWriter out = null;
+        BufferedWriter out;
+        BufferedReader in;
         try {
             out = new BufferedWriter(new FileWriter(targetFile, false));
-
-            out.write("@relation" + "  medical");
-            out.newLine();
+            out = appendBW(out, "@relation" + "  medical");
             List<String> attributeList = getColumeAttribute(sourceData);
             List<String> attribute = sourceData.get(0);
             int count = attribute.size();
             for (int i = 0; i < count; i++) {
-                out.write("@attribute " + attribute.get(i) + " " + attributeList.get(i));
+                out = appendBW(out, "@attribute " + attribute.get(i) + " " + attributeList.get(i));
             }
-            for (String innerAttribute : attribute) {
-
+            out = appendBW(out, "@data");
+            String appendData;
+            for (int i = 1; i < sourceData.size(); i++) {
+                if (sourceData.isEmpty() || sourceData.size() == 0) {
+                    continue;
+                }
+                appendData = StringUtils.join(sourceData.get(i), ",");
+                out = appendBW(out, appendData);
             }
-
+            out.flush();
+            out.close();
 
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
 
-        BufferedReader in;
+        return true;
+    }
 
+    /**
+     * 生成文件-追加内容
+     *
+     * @param bufferedWriter
+     * @param context
+     * @return
+     */
+    private BufferedWriter appendBW(BufferedWriter bufferedWriter, String context) {
         try {
-
-            String temp;
-            out = new BufferedWriter(new FileWriter(sourceFile, false));
-            //关系声明
-            out.write("@relation" + "  medical");
-            out.newLine();
-            //属性声明
-            int i1;
-            int column = 5;
-            for (i1 = 0; i1 < column; i1++) {
-                out.write("@attribute attr" + i1 + " String");
-                out.newLine();
-            }
-            //数据声明
-            out.write("@data");
-            out.newLine();
-            //读CSV文件
-            in = new BufferedReader(new FileReader(sourceFile));
-            temp = in.readLine();
-            while (temp != null) {
-                out.write(temp);
-                out.newLine();
-                temp = in.readLine();
-            }
-            in.close();
-            out.flush();
-            out.close();
-        } catch (Exception e) {
+            bufferedWriter.write(context);
+            bufferedWriter.newLine();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return bufferedWriter;
     }
 
     /**
@@ -92,10 +86,12 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         List<List<String>> result = new ArrayList<>();
 
         File csv = new File(sourceFile);
-        BufferedReader br = null;
+        BufferedReader br;
+        InputStreamReader inputStreamReader;
         try {
-            br = new BufferedReader(new FileReader(csv));
-            String line = "";
+            inputStreamReader = new InputStreamReader(new FileInputStream(csv), "GBK");
+            br = new BufferedReader(inputStreamReader);
+            String line;
             while ((line = br.readLine()) != null) {
                 List<String> innerList = new ArrayList<>();
                 String[] innerString = line.split(",");
@@ -144,8 +140,36 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         return result;
     }
 
+    /**
+     * csv 文件转 arrf
+     *
+     * @param sourceFile
+     * @param targetFile
+     */
+    public void csv2ArrfWithoutCN(String sourceFile, String targetFile) {
 
-    private Instances
+        CSVLoader csvLoader = new CSVLoader();
+        try {
+            csvLoader.setSource(new File(sourceFile));
+            Instances instance = csvLoader.getDataSet();
+
+            ArffSaver arffSaver = new ArffSaver();
+            arffSaver.setInstances(instance);
+            arffSaver.setFile(new File(targetFile));
+            arffSaver.writeBatch();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        String sourceFile = "F:\\Data\\data_waitDeal.csv";
+        String targetFile = "F:\\Data\\data_waitDeal.arff";
+        new Csv2ArffServiceImpl().GenerFile(sourceFile, targetFile);
+        System.out.println(new Date());
+    }
 
 
 }
