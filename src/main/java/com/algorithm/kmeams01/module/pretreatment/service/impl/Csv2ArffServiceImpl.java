@@ -22,33 +22,39 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
     public boolean GenerFile(String sourceFile, String targetFile) {
 
         List<List<String>> sourceData = getCsvData(sourceFile);
+        int sourceDataSize = sourceData.size();
 
-        if (sourceData.isEmpty() || sourceData.size() < 2) {
+        if (sourceData.isEmpty() || sourceDataSize < 2) {
             return false;
         }
 
-        BufferedWriter out;
-        BufferedReader in;
+        StringBuffer stringBuffer = new StringBuffer("");
+        FileWriter writer;
         try {
-            out = new BufferedWriter(new FileWriter(targetFile, false));
-            out = appendBW(out, "@relation" + "  medical");
+            writer = new FileWriter(targetFile);
+            stringBuffer = appendStringBuffer(stringBuffer, "@relation" + "  medical", 2);
             List<String> attributeList = getColumeAttribute(sourceData);
             List<String> attribute = sourceData.get(0);
             int count = attribute.size();
             for (int i = 0; i < count; i++) {
-                out = appendBW(out, "@attribute " + attribute.get(i) + " " + attributeList.get(i));
+                stringBuffer = appendStringBuffer(stringBuffer, "@attribute " + attribute.get(i) + " " + attributeList.get(i), 1);
             }
-            out = appendBW(out, "@data");
+            stringBuffer = appendStringBuffer(stringBuffer, "", 1);
+            stringBuffer = appendStringBuffer(stringBuffer, "@data", 1);
             String appendData;
-            for (int i = 1; i < sourceData.size(); i++) {
+            for (int i = 1; i < sourceDataSize; i++) {
                 if (sourceData.isEmpty() || sourceData.size() == 0) {
                     continue;
                 }
                 appendData = StringUtils.join(sourceData.get(i), ",");
-                out = appendBW(out, appendData);
+                stringBuffer = appendStringBuffer(stringBuffer, appendData, 1);
             }
-            out.flush();
-            out.close();
+
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(targetFile)), "GB2312"));
+            bufferedWriter.write(stringBuffer.toString());
+            bufferedWriter.close();
+            writer.close();
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,21 +64,22 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         return true;
     }
 
+
     /**
-     * 生成文件-追加内容
+     * 追加文件
      *
-     * @param bufferedWriter
-     * @param context
+     * @param stringBuffer
+     * @param string
+     * @param count
      * @return
      */
-    private BufferedWriter appendBW(BufferedWriter bufferedWriter, String context) {
-        try {
-            bufferedWriter.write(context);
-            bufferedWriter.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+    private StringBuffer appendStringBuffer(StringBuffer stringBuffer, String string, int count) {
+        stringBuffer.append(string);
+        while (count > 0) {
+            stringBuffer.append("\r\n");
+            count--;
         }
-        return bufferedWriter;
+        return stringBuffer;
     }
 
     /**
@@ -100,6 +107,7 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
                 }
                 result.add(innerList);
             }
+            br.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -163,6 +171,7 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         }
 
     }
+
 
     public static void main(String[] args) {
         String sourceFile = "F:\\Data\\data_waitDeal.csv";
