@@ -18,6 +18,13 @@ import java.util.regex.Pattern;
 public class Csv2ArffServiceImpl implements Csv2ArffService {
 
 
+    /**
+     * 数据处理：将csv文件处理成 arff文件
+     *
+     * @param sourceFile
+     * @param targetFile
+     * @return
+     */
     @Override
     public boolean GenerFile(String sourceFile, String targetFile) {
 
@@ -27,35 +34,17 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         if (sourceData.isEmpty() || sourceDataSize < 2) {
             return false;
         }
-
-        StringBuffer stringBuffer = new StringBuffer("");
-        FileWriter writer;
+        String arffString = getArffString(sourceData);
         try {
-            writer = new FileWriter(targetFile);
-            stringBuffer = appendStringBuffer(stringBuffer, "@relation" + "  medical", 2);
-            List<String> attributeList = getColumeAttribute(sourceData);
-            List<String> attribute = sourceData.get(0);
-            int count = attribute.size();
-            for (int i = 0; i < count; i++) {
-                stringBuffer = appendStringBuffer(stringBuffer, "@attribute " + attribute.get(i) + " " + attributeList.get(i), 1);
-            }
-            stringBuffer = appendStringBuffer(stringBuffer, "", 1);
-            stringBuffer = appendStringBuffer(stringBuffer, "@data", 1);
-            String appendData;
-            for (int i = 1; i < sourceDataSize; i++) {
-                if (sourceData.isEmpty() || sourceData.size() == 0) {
-                    continue;
-                }
-                appendData = StringUtils.join(sourceData.get(i), ",");
-                stringBuffer = appendStringBuffer(stringBuffer, appendData, 1);
-            }
-
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(targetFile)), "GB2312"));
-            bufferedWriter.write(stringBuffer.toString());
+            bufferedWriter.write(arffString);
             bufferedWriter.close();
-            writer.close();
-
-
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return false;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -64,9 +53,41 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         return true;
     }
 
+    /**
+     * 生成Arff内容字符串
+     *
+     * @param sourceData
+     * @return
+     */
+    private String getArffString(List<List<String>> sourceData) {
+
+        int sourceDataSize = sourceData.size();
+        StringBuffer stringBuffer = new StringBuffer("");
+
+        stringBuffer = appendStringBuffer(stringBuffer, "@relation" + "  medical", 2);
+        List<String> attributeList = getColumeAttribute(sourceData);
+        List<String> attribute = sourceData.get(0);
+        int count = attribute.size();
+        for (int i = 0; i < count; i++) {
+            stringBuffer = appendStringBuffer(stringBuffer, "@attribute " + attribute.get(i) + " " + attributeList.get(i), 1);
+        }
+        stringBuffer = appendStringBuffer(stringBuffer, "", 1);
+        stringBuffer = appendStringBuffer(stringBuffer, "@data", 1);
+        String appendData;
+        for (int i = 1; i < sourceDataSize; i++) {
+            if (sourceData.isEmpty() || sourceData.size() == 0) {
+                continue;
+            }
+            appendData = StringUtils.join(sourceData.get(i), ",");
+            stringBuffer = appendStringBuffer(stringBuffer, appendData, 1);
+        }
+        return stringBuffer.toString();
+
+    }
+
 
     /**
-     * 追加文件
+     * 追加文件字符串内容
      *
      * @param stringBuffer
      * @param string
@@ -87,8 +108,7 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
      *
      * @param sourceFile
      */
-    @Override
-    public List<List<String>> getCsvData(String sourceFile) {
+    private List<List<String>> getCsvData(String sourceFile) {
 
         List<List<String>> result = new ArrayList<>();
 
