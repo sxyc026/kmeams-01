@@ -1,4 +1,4 @@
-package com.algorithm.kmeams01.module.web;
+package com.algorithm.kmeams01.module.calculating.web;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;

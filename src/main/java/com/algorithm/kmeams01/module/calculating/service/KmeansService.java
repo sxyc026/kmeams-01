@@ -1,4 +1,4 @@
-package com.algorithm.kmeams01.module.service;
+package com.algorithm.kmeams01.module.calculating.service;
 
 import org.springframework.stereotype.Service;
 
