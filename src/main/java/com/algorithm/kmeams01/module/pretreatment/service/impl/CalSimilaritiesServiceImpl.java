@@ -11,32 +11,8 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
 
 
     @Override
-    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted) {
+    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isRate, boolean isCode, boolean isWeighted) {
 
-        return calSimilaritiesUtil(csvData, type, isPercent, isCode, isWeighted);
-    }
-
-    @Override
-    public List<Similarity> calSimilarities(List<List<String>> csvData, String type) {
-        return calSimilaritiesUtil(csvData, type, false, true, true);
-    }
-
-    @Override
-    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isCode) {
-        return calSimilaritiesUtil(csvData, "", false, isCode, false);
-    }
-
-    /**
-     * 计算相似度单元方法
-     *
-     * @param csvData
-     * @param type
-     * @param isPercent
-     * @param isCode
-     * @param isWeighted
-     * @return
-     */
-    private List<Similarity> calSimilaritiesUtil(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted) {
         if (type == null || type.isEmpty()) {
             type = "undirected";
         }
@@ -52,7 +28,7 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
                 Similarity similarity = new Similarity();
                 similarity.setSource(i + "");
                 similarity.setTarget(j + "");
-                similarity.setWeight(calWeightUtil(csvData.get(i), csvData.get(j), isPercent, isCode, isWeighted));
+                similarity.setWeight(calWeightUtil(csvData.get(i), csvData.get(j), isRate, isCode, isWeighted));
                 similarity.setType(type);
                 similarityList.add(similarity);
             }
@@ -62,54 +38,15 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
     }
 
     /**
-     * 计算两个节点的相似度
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private Double calWeight(List<String> source, List<String> target, boolean isCode) {
-
-        return calWeightUtil(source, target, false, false, isCode);
-
-    }
-
-    /**
-     * 计算两个节点的相似度,百分比
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private Double calWeightPercent(List<String> source, List<String> target, boolean isCode) {
-
-        return calWeightUtil(source, target, true, false, isCode);
-
-    }
-
-    /**
-     * 计算两个节点的相似度,百分比
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private Double calWeightPercentAndWeighted(List<String> source, List<String> target, boolean isCode) {
-
-        return calWeightUtil(source, target, true, true, isCode);
-
-    }
-
-    /**
      * 计算相似度
      *
      * @param source     源数据
      * @param target     目标数据
-     * @param isPercent  是否返回百分比
+     * @param isRate  是否返回百分比
      * @param isWeighted 是否计算百分比后乘以100
      * @return
      */
-    private Double calWeightUtil(List<String> source, List<String> target, boolean isPercent, boolean isWeighted, boolean isCode) {
+    private Double calWeightUtil(List<String> source, List<String> target, boolean isRate, boolean isWeighted, boolean isCode) {
 
         int weight = 0;
 
@@ -125,7 +62,7 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
 
         }
 
-        if (isPercent) {
+        if (isRate) {
 
             BigDecimal denominator = new BigDecimal(count);
             BigDecimal numerator = new BigDecimal(weight);

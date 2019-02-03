@@ -1,15 +1,8 @@
 package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
-import com.algorithm.kmeams01.common.ExcelTemplate;
 import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
-import com.algorithm.kmeams01.module.pretreatment.service.CalSimilaritiesService;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLDataSourceService;
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,42 +12,15 @@ import java.util.Set;
  */
 public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
-    @Autowired
-    private CalSimilaritiesService calSimilarities;
-
-    @Override
-    public List<Similarity> generateDataSource(String sourceFile, String targetFile, String type) {
-
-        return generateDateSourceUtil(sourceFile, targetFile, type, true);
-
-    }
-
-    @Override
-    public List<Similarity> generateDataSource(String sourceFile, String targetFile, String type, boolean isCode) {
-        return generateDateSourceUtil(sourceFile, targetFile, type, isCode);
-
-    }
-
-    @Override
-    public void generateGMLFile(String sourceFile, String targetFile, String type, boolean isCode) {
-
-        List<Similarity> similarities = generateDataSource(sourceFile, targetFile, type, isCode);
-        String gmlData = getGMLData(similarities);
-        try {
-            FileUtils.write(new File(targetFile),gmlData, Charset.forName("UTF-8"),false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
+    
     /**
      * 生成GML所用的数据源
+     *
      * @param similarities
      * @return
      */
-    private String getGMLData(List<Similarity> similarities){
+    @Override
+    public String getGMLData(List<Similarity> similarities) {
 
         //edges
         Set<String> edgesSet = new HashSet<>();
@@ -102,27 +68,5 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
         return stringBuffer.toString();
     }
 
-
-    /**
-     * 生成可用数据单元
-     *
-     * @param sourceFile
-     * @param targetFile
-     * @param type
-     * @param isCode
-     */
-    private List<Similarity> generateDateSourceUtil(String sourceFile, String targetFile, String type, boolean isCode) {
-
-        List<List<String>> csvDataWithCode = ExcelTemplate.getCsvDataWithCode(sourceFile);
-        if (csvDataWithCode.size() == 0) {
-            return null;
-        }
-
-        //计算相似度
-        List<Similarity> similarityList = calSimilarities.calSimilarities(csvDataWithCode, type, true);
-
-        return similarityList;
-
-    }
 
 }
