@@ -19,6 +19,10 @@ public interface CalSimilaritiesService {
 
     Double calWeightPercent(List<String> source, List<String> target, boolean isCode);
 
+    List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode);
+
+    List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted);
+
     Double calWeight(List<String> source, List<String> target, boolean isCode);
 
 }

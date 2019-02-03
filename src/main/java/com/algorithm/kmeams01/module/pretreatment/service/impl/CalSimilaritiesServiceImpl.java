@@ -11,7 +11,17 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
 
 
     @Override
-    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isCode) {
+    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode) {
+        return calSimilaritiesUtil(csvData, type, isPercent, isCode, false);
+    }
+
+    @Override
+    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted) {
+
+        return calSimilaritiesUtil(csvData, type, isPercent, isCode, isWeighted);
+    }
+
+    private List<Similarity> calSimilaritiesUtil(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted) {
         if (type == null || type.isEmpty()) {
             type = "undirected";
         }
@@ -27,14 +37,13 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
                 Similarity similarity = new Similarity();
                 similarity.setSource(i + "");
                 similarity.setTarget(j + "");
-                similarity.setWeight(calWeightPercentAndWeighted(csvData.get(i), csvData.get(j), isCode));
+                similarity.setWeight(calWeightUtil(csvData.get(i), csvData.get(j), isPercent, isCode, isWeighted));
                 similarity.setType(type);
                 similarityList.add(similarity);
             }
 
         }
         return similarityList;
-
     }
 
     /**
@@ -63,6 +72,11 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
 
         return calWeightUtil(source, target, true, false, isCode);
 
+    }
+
+    @Override
+    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isCode) {
+        return null;
     }
 
     /**
