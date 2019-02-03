@@ -11,16 +11,31 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
 
 
     @Override
-    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode) {
-        return calSimilaritiesUtil(csvData, type, isPercent, isCode, false);
-    }
-
-    @Override
     public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted) {
 
         return calSimilaritiesUtil(csvData, type, isPercent, isCode, isWeighted);
     }
 
+    @Override
+    public List<Similarity> calSimilarities(List<List<String>> csvData, String type) {
+        return calSimilaritiesUtil(csvData, type, false, true, true);
+    }
+
+    @Override
+    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isCode) {
+        return calSimilaritiesUtil(csvData, "", false, isCode, false);
+    }
+
+    /**
+     * 计算相似度单元方法
+     *
+     * @param csvData
+     * @param type
+     * @param isPercent
+     * @param isCode
+     * @param isWeighted
+     * @return
+     */
     private List<Similarity> calSimilaritiesUtil(List<List<String>> csvData, String type, boolean isPercent, boolean isCode, boolean isWeighted) {
         if (type == null || type.isEmpty()) {
             type = "undirected";
@@ -53,8 +68,7 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
      * @param target
      * @return
      */
-    @Override
-    public Double calWeight(List<String> source, List<String> target, boolean isCode) {
+    private Double calWeight(List<String> source, List<String> target, boolean isCode) {
 
         return calWeightUtil(source, target, false, false, isCode);
 
@@ -67,16 +81,10 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
      * @param target
      * @return
      */
-    @Override
-    public Double calWeightPercent(List<String> source, List<String> target, boolean isCode) {
+    private Double calWeightPercent(List<String> source, List<String> target, boolean isCode) {
 
         return calWeightUtil(source, target, true, false, isCode);
 
-    }
-
-    @Override
-    public List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isCode) {
-        return null;
     }
 
     /**
@@ -86,8 +94,7 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
      * @param target
      * @return
      */
-    @Override
-    public Double calWeightPercentAndWeighted(List<String> source, List<String> target, boolean isCode) {
+    private Double calWeightPercentAndWeighted(List<String> source, List<String> target, boolean isCode) {
 
         return calWeightUtil(source, target, true, true, isCode);
 
