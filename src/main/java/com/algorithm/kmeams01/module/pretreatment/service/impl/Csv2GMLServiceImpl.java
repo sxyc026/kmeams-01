@@ -3,7 +3,6 @@ package com.algorithm.kmeams01.module.pretreatment.service.impl;
 import com.algorithm.kmeams01.common.ExcelTemplate;
 import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLService;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,41 +15,50 @@ import java.util.List;
 public class Csv2GMLServiceImpl implements Csv2GMLService {
 
     @Override
-    public void generateDataFile(String sourceFile, String targetFile, String type) {
+    public List<Similarity> generateDataFile(String sourceFile, String targetFile, String type) {
 
-        generateDateFileUtil(sourceFile, targetFile, type, true);
-
+       return generateDateFileUtil(sourceFile, targetFile, type, true);
 
     }
 
     @Override
-    public void generateDataFile(String sourceFile, String targetFile, String type, boolean isCode) {
-        generateDateFileUtil(sourceFile, targetFile, type, isCode);
+    public List<Similarity> generateDataFile(String sourceFile, String targetFile, String type, boolean isCode) {
+        return generateDateFileUtil(sourceFile, targetFile, type, isCode);
 
     }
 
     /**
      * 生成可用数据单元
-     *
-     * @param sourceFile
+     *  @param sourceFile
      * @param targetFile
      * @param type
      * @param isCode
      */
-    private void generateDateFileUtil(String sourceFile, String targetFile, String type, boolean isCode) {
+    private List<Similarity> generateDateFileUtil(String sourceFile, String targetFile, String type, boolean isCode) {
 
         List<List<String>> csvDataWithCode = ExcelTemplate.getCsvDataWithCode(sourceFile);
         if (csvDataWithCode.size() == 0) {
-            return;
+            return null;
         }
 
         //计算相似度
         List<Similarity> similarityList = calSimilarities(csvDataWithCode, type, true);
-        for (Similarity similarity : similarityList) {
-            System.out.println(similarity.getSource() + "  " + similarity.getTarget() + " " + similarity.getType() + " " + similarity.getWeight());
-        }
+
+        return similarityList;
 
     }
+
+    /**
+     *生成GML数据
+     * @param similarityList
+     */
+    private void generateGMLFile(List<Similarity> similarityList ){
+
+
+
+
+    }
+
 
     /**
      * 计算给定数据的相似度
@@ -155,11 +163,11 @@ public class Csv2GMLServiceImpl implements Csv2GMLService {
 
             BigDecimal denominator = new BigDecimal(count);
             BigDecimal numerator = new BigDecimal(weight);
-            Double result = numerator.divide(denominator, 4, BigDecimal.ROUND_HALF_UP).doubleValue();
+            BigDecimal result = numerator.divide(denominator, 4, BigDecimal.ROUND_HALF_UP);
             if (isWeighted) {
-                return result * 100;
+                result = result.multiply(new BigDecimal(100));
             }
-            return result;
+            return result.doubleValue();
         }
 
         return Double.valueOf(weight);
@@ -169,7 +177,7 @@ public class Csv2GMLServiceImpl implements Csv2GMLService {
     public static void main(String[] args) {
         String sourceFile = "F:\\Data\\data_waitDeal.csv";
         String targetFile = "F:\\Data\\data_waitDeal.arff";
-        new Csv2GMLServiceImpl().generateDataFile(sourceFile, targetFile, "有向", true);
+        new Csv2GMLServiceImpl().generateDataFile(sourceFile, targetFile, "无向", true);
         System.out.println(new Date());
     }
 
