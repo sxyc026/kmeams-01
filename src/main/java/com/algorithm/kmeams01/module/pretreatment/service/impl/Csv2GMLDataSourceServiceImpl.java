@@ -2,7 +2,6 @@ package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
 import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLDataSourceService;
-import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Set;
 /**
  * 生成GML文件
  */
-@Service
 public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
 
