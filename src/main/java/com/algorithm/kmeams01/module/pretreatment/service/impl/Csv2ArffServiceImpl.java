@@ -1,5 +1,6 @@
 package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
+import com.algorithm.kmeams01.common.ExcelTemplate;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2ArffService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
     @Override
     public boolean GenerFile(String sourceFile, String targetFile) {
 
-        List<List<String>> sourceData = getCsvData(sourceFile);
+        List<List<String>> sourceData = ExcelTemplate.getCsvData(sourceFile);
         int sourceDataSize = sourceData.size();
 
         if (sourceData.isEmpty() || sourceDataSize < 2) {
@@ -103,40 +104,6 @@ public class Csv2ArffServiceImpl implements Csv2ArffService {
         return stringBuffer;
     }
 
-    /**
-     * 读取CSV 文件
-     *
-     * @param sourceFile
-     */
-    private List<List<String>> getCsvData(String sourceFile) {
-
-        List<List<String>> result = new ArrayList<>();
-
-        File csv = new File(sourceFile);
-        BufferedReader br;
-        InputStreamReader inputStreamReader;
-        try {
-            inputStreamReader = new InputStreamReader(new FileInputStream(csv), "GBK");
-            br = new BufferedReader(inputStreamReader);
-            String line;
-            while ((line = br.readLine()) != null) {
-                List<String> innerList = new ArrayList<>();
-                String[] innerString = line.split(",");
-                for (String inner : innerString) {
-                    innerList.add(inner);
-                }
-                result.add(innerList);
-            }
-            br.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
-
-    }
 
     /**
      * 生成属性值
