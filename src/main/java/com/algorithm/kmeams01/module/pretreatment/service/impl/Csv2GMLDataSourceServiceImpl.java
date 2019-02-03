@@ -2,6 +2,7 @@ package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
 import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLDataSourceService;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,9 +11,10 @@ import java.util.Set;
 /**
  * 生成GML文件
  */
+@Service
 public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
-    
+
     /**
      * 生成GML所用的数据源
      *
@@ -36,12 +38,12 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
             }
             nodesSet.add(source);
             nodesSet.add(target);
-            StringBuffer edgeInner = new StringBuffer("edge\n")
-                    .append("[\n")
-                    .append("  source ").append(source).append("\n")
-                    .append("  target ").append(target).append("\n")
+            StringBuffer edgeInner = new StringBuffer("  edge\n")
+                    .append("  [\n")
+                    .append("  source  ").append(source).append("\n")
+                    .append("  target  ").append(target).append("\n")
                     .append("  weight ").append(similarity.getWeight()).append("\n")
-                    .append("]\n");
+                    .append("  ]\n");
 
             edgesSet.add(edgeInner.toString());
 
@@ -49,10 +51,10 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
         StringBuffer nodesBuffer = new StringBuffer();
         for (String node : nodesSet) {
-            nodesBuffer.append("node\n")
-                    .append("[\n")
-                    .append("  id ").append(node).append("\n")
-                    .append("]\n");
+            nodesBuffer.append("  node\n")
+                    .append("  [\n")
+                    .append("    id ").append(node).append("\n")
+                    .append("  ]\n");
         }
 
         StringBuffer edgesBuffer = new StringBuffer();
@@ -63,10 +65,9 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
         stringBuffer.append(nodesBuffer.toString());
         stringBuffer.append(edgesBuffer.toString());
-        stringBuffer.append("\n]");
+        stringBuffer.append("]");
 
         return stringBuffer.toString();
     }
-
 
 }

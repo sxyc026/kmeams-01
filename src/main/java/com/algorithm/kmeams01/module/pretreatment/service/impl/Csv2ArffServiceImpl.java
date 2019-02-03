@@ -3,7 +3,6 @@ package com.algorithm.kmeams01.module.pretreatment.service.impl;
 import com.algorithm.kmeams01.common.ExcelTemplate;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2ArffService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
@@ -15,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Service
 public class Csv2ArffServiceImpl implements Csv2ArffService {
 
 
