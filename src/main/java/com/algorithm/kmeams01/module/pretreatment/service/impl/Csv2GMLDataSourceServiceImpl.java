@@ -2,7 +2,7 @@ package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
 import com.algorithm.kmeams01.common.ExcelTemplate;
 import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
-import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLService;
+import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLDataSourceService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,18 +12,18 @@ import java.util.List;
 /**
  * 生成GML文件
  */
-public class Csv2GMLServiceImpl implements Csv2GMLService {
+public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
     @Override
-    public List<Similarity> generateDataFile(String sourceFile, String targetFile, String type) {
+    public List<Similarity> generateDataSource(String sourceFile, String targetFile, String type) {
 
-       return generateDateFileUtil(sourceFile, targetFile, type, true);
+       return generateDateSourceUtil(sourceFile, targetFile, type, true);
 
     }
 
     @Override
-    public List<Similarity> generateDataFile(String sourceFile, String targetFile, String type, boolean isCode) {
-        return generateDateFileUtil(sourceFile, targetFile, type, isCode);
+    public List<Similarity> generateDataSource(String sourceFile, String targetFile, String type, boolean isCode) {
+        return generateDateSourceUtil(sourceFile, targetFile, type, isCode);
 
     }
 
@@ -34,7 +34,7 @@ public class Csv2GMLServiceImpl implements Csv2GMLService {
      * @param type
      * @param isCode
      */
-    private List<Similarity> generateDateFileUtil(String sourceFile, String targetFile, String type, boolean isCode) {
+    private List<Similarity> generateDateSourceUtil(String sourceFile, String targetFile, String type, boolean isCode) {
 
         List<List<String>> csvDataWithCode = ExcelTemplate.getCsvDataWithCode(sourceFile);
         if (csvDataWithCode.size() == 0) {
@@ -177,7 +177,7 @@ public class Csv2GMLServiceImpl implements Csv2GMLService {
     public static void main(String[] args) {
         String sourceFile = "F:\\Data\\data_waitDeal.csv";
         String targetFile = "F:\\Data\\data_waitDeal.arff";
-        new Csv2GMLServiceImpl().generateDataFile(sourceFile, targetFile, "无向", true);
+        new Csv2GMLDataSourceServiceImpl().generateDataSource(sourceFile, targetFile, "无向", true);
         System.out.println(new Date());
     }
 

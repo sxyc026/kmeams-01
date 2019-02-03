@@ -4,7 +4,7 @@ import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
 
 import java.util.List;
 
-public interface Csv2GMLService {
+public interface Csv2GMLDataSourceService {
 
     /**
      * 生成Gephi 和 Kmeans 可用的数据文件
@@ -12,7 +12,7 @@ public interface Csv2GMLService {
      * @param targetFile
      * @param type
      */
-    List<Similarity> generateDataFile(String sourceFile, String targetFile, String type);
+    List<Similarity> generateDataSource(String sourceFile, String targetFile, String type);
 
     /**
      * 生成Gephi 和 Kmeans 可用的数据文件，可定义是否增加编号
@@ -20,6 +20,6 @@ public interface Csv2GMLService {
      * @param targetFile
      * @param type
      */
-    List<Similarity> generateDataFile(String sourceFile, String targetFile, String type, boolean isCode);
+    List<Similarity> generateDataSource(String sourceFile, String targetFile, String type, boolean isCode);
 
 }
