@@ -2,22 +2,30 @@ package com.algorithm.kmeams01.module.pretreatment.service.impl;
 
 import com.algorithm.kmeams01.common.ExcelTemplate;
 import com.algorithm.kmeams01.module.pretreatment.entity.Similarity;
+import com.algorithm.kmeams01.module.pretreatment.service.CalSimilaritiesService;
 import com.algorithm.kmeams01.module.pretreatment.service.Csv2GMLDataSourceService;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 生成GML文件
  */
 public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
+    @Autowired
+    private CalSimilaritiesService calSimilarities;
+
     @Override
     public List<Similarity> generateDataSource(String sourceFile, String targetFile, String type) {
 
-       return generateDateSourceUtil(sourceFile, targetFile, type, true);
+        return generateDateSourceUtil(sourceFile, targetFile, type, true);
 
     }
 
@@ -27,9 +35,78 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
 
     }
 
+    @Override
+    public void generateGMLFile(String sourceFile, String targetFile, String type, boolean isCode) {
+
+        List<Similarity> similarities = generateDataSource(sourceFile, targetFile, type, isCode);
+        String gmlData = getGMLData(similarities);
+        try {
+            FileUtils.write(new File(targetFile),gmlData, Charset.forName("UTF-8"),false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /**
+     * 生成GML所用的数据源
+     * @param similarities
+     * @return
+     */
+    private String getGMLData(List<Similarity> similarities){
+
+        //edges
+        Set<String> edgesSet = new HashSet<>();
+        //nodes
+        Set<String> nodesSet = new HashSet<>();
+
+        for (Similarity similarity : similarities) {
+            String source = similarity.getSource();
+            String target = similarity.getTarget();
+
+            if (source == null || target == null) {
+                continue;
+            }
+            nodesSet.add(source);
+            nodesSet.add(target);
+            StringBuffer edgeInner = new StringBuffer("edge\n")
+                    .append("[\n")
+                    .append("  source ").append(source).append("\n")
+                    .append("  target ").append(target).append("\n")
+                    .append("  weight ").append(similarity.getWeight()).append("\n")
+                    .append("]\n");
+
+            edgesSet.add(edgeInner.toString());
+
+        }
+
+        StringBuffer nodesBuffer = new StringBuffer();
+        for (String node : nodesSet) {
+            nodesBuffer.append("node\n")
+                    .append("[\n")
+                    .append("  id ").append(node).append("\n")
+                    .append("]\n");
+        }
+
+        StringBuffer edgesBuffer = new StringBuffer();
+        for (String edge : edgesSet) {
+            edgesBuffer.append(edge);
+        }
+        StringBuffer stringBuffer = new StringBuffer("graph\n").append("[\n");
+
+        stringBuffer.append(nodesBuffer.toString());
+        stringBuffer.append(edgesBuffer.toString());
+        stringBuffer.append("\n]");
+
+        return stringBuffer.toString();
+    }
+
+
     /**
      * 生成可用数据单元
-     *  @param sourceFile
+     *
+     * @param sourceFile
      * @param targetFile
      * @param type
      * @param isCode
@@ -42,144 +119,10 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
         }
 
         //计算相似度
-        List<Similarity> similarityList = calSimilarities(csvDataWithCode, type, true);
+        List<Similarity> similarityList = calSimilarities.calSimilarities(csvDataWithCode, type, true);
 
         return similarityList;
 
     }
-
-    /**
-     *生成GML数据
-     * @param similarityList
-     */
-    private void generateGMLFile(List<Similarity> similarityList ){
-
-
-
-
-    }
-
-
-    /**
-     * 计算给定数据的相似度
-     *
-     * @param csvData
-     * @param type
-     * @return
-     */
-    private List<Similarity> calSimilarities(List<List<String>> csvData, String type, boolean isCode) {
-
-        if (type == null || type.isEmpty()) {
-            type = "undirected";
-        }
-        //计算相似度
-        List<Similarity> similarityList = new ArrayList<>();
-        int count = csvData.size();
-        for (int i = 0; i < count; i++) {
-
-            for (int j = 0; j < count; j++) {
-                if (i == j) {
-                    continue;
-                }
-                Similarity similarity = new Similarity();
-                similarity.setSource(i + "");
-                similarity.setTarget(j + "");
-                similarity.setWeight(calWeightPercentAndWeighted(csvData.get(i), csvData.get(j), isCode));
-                similarity.setType(type);
-                similarityList.add(similarity);
-            }
-
-        }
-        return similarityList;
-
-    }
-
-
-    /**
-     * 计算两个节点的相似度
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private Double calWeight(List<String> source, List<String> target, boolean isCode) {
-
-        return calWeightUtil(source, target, false, false, isCode);
-
-    }
-
-    /**
-     * 计算两个节点的相似度,百分比
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private Double calWeightPercent(List<String> source, List<String> target, boolean isCode) {
-
-        return calWeightUtil(source, target, true, false, isCode);
-
-    }
-
-    /**
-     * 计算两个节点的相似度,百分比
-     *
-     * @param source
-     * @param target
-     * @return
-     */
-    private Double calWeightPercentAndWeighted(List<String> source, List<String> target, boolean isCode) {
-
-        return calWeightUtil(source, target, true, true, isCode);
-
-    }
-
-    /**
-     * 计算相似度
-     *
-     * @param source     源数据
-     * @param target     目标数据
-     * @param isPercent  是否返回百分比
-     * @param isWeighted 是否计算百分比后乘以100
-     * @return
-     */
-    private Double calWeightUtil(List<String> source, List<String> target, boolean isPercent, boolean isWeighted, boolean isCode) {
-
-        int weight = 0;
-
-        int count = source.size();
-        if (count != target.size() || count == 0) {
-            return 0.0;
-        }
-
-        for (int i = (isCode ? 1 : 0); i < source.size(); i++) {
-            if (source.get(i).equalsIgnoreCase(target.get(i))) {
-                weight++;
-            }
-
-        }
-
-        if (isPercent) {
-
-            BigDecimal denominator = new BigDecimal(count);
-            BigDecimal numerator = new BigDecimal(weight);
-            BigDecimal result = numerator.divide(denominator, 4, BigDecimal.ROUND_HALF_UP);
-            if (isWeighted) {
-                result = result.multiply(new BigDecimal(100));
-            }
-            return result.doubleValue();
-        }
-
-        return Double.valueOf(weight);
-    }
-
-
-    public static void main(String[] args) {
-        String sourceFile = "F:\\Data\\data_waitDeal.csv";
-        String targetFile = "F:\\Data\\data_waitDeal.arff";
-        new Csv2GMLDataSourceServiceImpl().generateDataSource(sourceFile, targetFile, "无向", true);
-        System.out.println(new Date());
-    }
-
 
 }
