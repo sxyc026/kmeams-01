@@ -38,14 +38,17 @@ public class Csv2GMLDataSourceServiceImpl implements Csv2GMLDataSourceService {
             }
             nodesSet.add(source);
             nodesSet.add(target);
-            StringBuffer edgeInner = new StringBuffer("  edge\n")
-                    .append("  [\n")
-                    .append("  source  ").append(source).append("\n")
-                    .append("  target  ").append(target).append("\n")
-                    .append("  weight ").append(similarity.getWeight()).append("\n")
-                    .append("  ]\n");
+            if (similarity.getWeight().doubleValue() != 0) {
+                StringBuffer edgeInner = new StringBuffer("  edge\n")
+                        .append("  [\n")
+                        .append("  source  ").append(source).append("\n")
+                        .append("  target  ").append(target).append("\n")
+                        .append("  weight ").append(similarity.getWeight()).append("\n")
+                        .append("  ]\n");
 
-            edgesSet.add(edgeInner.toString());
+                edgesSet.add(edgeInner.toString());
+            }
+
 
         }
 
