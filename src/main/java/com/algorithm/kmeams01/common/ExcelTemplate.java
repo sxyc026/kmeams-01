@@ -4,6 +4,7 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ExcelTemplate {
@@ -41,7 +42,7 @@ public class ExcelTemplate {
      * @return
      */
     private static List<List<String>> getCsvDataUtil(String sourceFile, boolean isCode) {
-        List<List<String>> result = new ArrayList<>();
+        List<List<String>> result = new LinkedList<>();
 
         File csv = new File(sourceFile);
         BufferedReader br;

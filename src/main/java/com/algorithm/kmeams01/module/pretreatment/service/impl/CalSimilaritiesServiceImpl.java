@@ -18,9 +18,10 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
         //计算相似度
         List<Similarity> similarityList = new ArrayList<>();
         int count = csvData.size();
-        for (int i = 0; i < count; i++) {
+        int start = isCode?1:0;
+        for (int i = start; i < count; i++) {
 
-            for (int j = 0; j < count; j++) {
+            for (int j = start; j < count; j++) {
                 if (i == j) {
                     continue;
                 }
@@ -54,7 +55,7 @@ public class CalSimilaritiesServiceImpl implements CalSimilaritiesService {
             return 0.0;
         }
 
-        for (int i = (isCode ? 1 : 0); i < source.size(); i++) {
+        for (int i = (isCode ? 1 : 0); i < count; i++) {
             if (source.get(i).equalsIgnoreCase(target.get(i))) {
                 weight++;
             }
